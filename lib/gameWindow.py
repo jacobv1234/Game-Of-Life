@@ -1,0 +1,138 @@
+from tkinter import *
+from tkinter import PhotoImage
+
+from lib.gridlines import GridLines
+from lib.grid import Grid
+
+class GameWindow:
+    def __init__(self, grid: Grid):
+        self.grid = grid # get a pointer to the grid
+        self.running = True
+        self.dragState = 0
+        self.mouseOnButton = False
+        self.simulationOn = False
+
+
+        self.w = Tk()
+        
+        self.w.protocol("WM_DELETE_WINDOW", self.close_program)
+
+        self.w.title('Game of Life')
+
+        self.width = self.w.winfo_screenwidth() - 10
+        self.height = self.w.winfo_screenheight() - 75
+
+        self.w.state('zoomed')
+        self.c = Canvas(self.w, width = self.width, height = self.height,
+                        xscrollincrement = 1, yscrollincrement = 1,
+                        bg = 'white')
+        self.c.place(x=0,y=0,anchor='nw')
+
+        # load images
+        self.images = {
+            'play': PhotoImage(file='images/play.png'),
+            'pause': PhotoImage(file='images/pause.png')
+        }
+
+
+        # visible area tracking
+        self.left = 0
+        self.top = 0
+        self.cellSize = 20
+
+        # gridlines
+        self.gridlines = GridLines(self.c, self.width, self.height)
+
+        # cells
+        self.cells = []
+
+        # mouse cursor tracking
+        self.cursor = self.c.create_rectangle(0,0,self.cellSize,self.cellSize, fill='', outline="#0000bd")
+        self.curx = 0
+        self.cury = 0
+        self.c.bind_all('<Motion>', self.move_cursor)
+        self.c.bind_all('<Button-1>', self.toggle_cell)
+        self.c.bind_all('<B1-Motion>', self.drag_draw)
+
+        # buttons
+        self.playButton = Button(self.w,border=5, command=self.toggle_play, image=self.images['play'])
+        self.playButton.place(width=70, height=70, relx=0, rely=1, anchor='sw')
+
+    # move highlighted square
+    def move_cursor(self, event: Event):
+        sx, sy = event.x, event.y
+
+        # check mouse is not hovering on a button
+        if event.widget == self.playButton:
+            # move blue cursor offscreen and shrink it
+            self.mouseOnButton = True
+            self.c.coords(-10,-10,-10,-10)
+            return
+        
+        x, y = self.c.canvasx(sx), self.c.canvasy(sy)
+        # truncate to find cell
+        self.curx = (x // self.cellSize) * self.cellSize
+        self.cury = (y // self.cellSize) * self.cellSize
+        # move cursor
+        self.c.coords(self.cursor, self.curx, self.cury, self.curx+self.cellSize, self.cury+self.cellSize)
+        self.mouseOnButton = False
+
+    
+    # click to draw
+    def toggle_cell(self,event):
+        sx, sy = event.x, event.y
+
+        # check mouse is not hovering on a button
+        if self.mouseOnButton:
+            return
+
+        x, y = self.c.canvasx(sx), self.c.canvasy(sy)
+        xi = int(x // self.cellSize)
+        yi = int(y // self.cellSize)
+        self.dragState = self.grid.toggle(xi,yi)
+    
+    # click and drag to draw
+    def drag_draw(self,event):
+        sx, sy = event.x, event.y
+
+        # check mouse is not hovering on a button
+        if self.mouseOnButton:
+            return
+        
+        x, y = self.c.canvasx(sx), self.c.canvasy(sy)
+        xi = int(x // self.cellSize)
+        yi = int(y // self.cellSize)
+        self.grid.set(xi,yi,self.dragState)
+    
+
+    # play / pause button clicked
+    def toggle_play(self):
+        if self.simulationOn:
+            self.simulationOn = False
+            self.playButton.config(image = self.images['play'])
+        else:
+            self.simulationOn = True
+            self.playButton.config(image = self.images['pause'])
+
+    
+    def close_program(self):
+        self.running = False
+
+    
+    def update(self):
+        # remove non-static features from last frame (cells)
+        for cell in self.cells:
+            self.c.delete(cell)
+
+        # draw cells
+        # only in visible range
+        for x in range(self.left, self.left+self.width, self.cellSize):
+            for y in range(self.top, self.top+self.height, self.cellSize):
+                xi = int(x // self.cellSize)
+                yi = int(y // self.cellSize)
+                if self.grid.grid[xi][yi] == 1:
+                    self.cells.append(
+                        self.c.create_rectangle(x,y, x+self.cellSize, y+self.cellSize, fill='black')
+                    )
+
+        self.w.update()
