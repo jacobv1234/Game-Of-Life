@@ -20,9 +20,9 @@ while window.running:
     window.update()
 
     # frame rate lock
-    # fixed at almost 60 fps
-    # if calculations take longer than 1/60s then run as fast as possible instead
+    # fixed at almost 30 fps
+    # if calculations take longer than 1/30s then run as fast as possible instead
     end = perf_counter()
     diff = end - start
-    if diff < 1 / 60:
-        sleep(1 / 60 - diff)
+    if diff < 1 / 30:
+        sleep(1 / 30 - diff)
