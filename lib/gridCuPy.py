@@ -1,13 +1,14 @@
 import numpy as np
-from scipy.signal import convolve2d
+import cupy as cp
+from cupyx.scipy.signal import convolve2d
 from time import perf_counter
 
-from lib.rule import Rule
+from lib.ruleCuPy import Rule
 
 class Grid:
     def __init__(self, rule: Rule):
         self.gridsize = 500
-        self.grid = np.zeros(self.gridsize**2, dtype='byte')
+        self.grid = cp.zeros(self.gridsize**2, dtype='byte')
         self.grid = self.grid.reshape((self.gridsize,self.gridsize))
         self.rule = rule
     
@@ -17,13 +18,12 @@ class Grid:
 
     def set(self,x:int,y:int,s:int):
         self.grid[x][y] = s
-    
+
+
     def next(self):
-        # this version can't be better until using cupy
         neighbour_counts = convolve2d(self.grid, self.rule.n, mode='same', boundary=self.rule.edge, fillvalue=0)
-        interleaved_state = np.stack([self.grid, neighbour_counts], axis=2)
-        newState = np.apply_along_axis(self.rule.newState, 2, interleaved_state)
+        interleaved_state = cp.stack([self.grid, neighbour_counts], axis=2)
+        newState = cp.apply_along_axis(self.rule.newState, 2, interleaved_state)
         self.grid = newState
-    
     
         
