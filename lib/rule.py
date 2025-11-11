@@ -11,7 +11,7 @@ class Rule:
         ]
         self.edge = 'fill' # 'fill': edge is all 0, 'wrap': edge wraps around
     
-    # state is np/cp array [alive, neighbours]
+    # state is np array [alive, neighbours]
     def newState(self, state):
         if state[0] == 0:
             return int(state[1] in self.b)

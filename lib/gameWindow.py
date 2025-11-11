@@ -58,12 +58,18 @@ class GameWindow:
         self.playButton = Button(self.w,border=5, command=self.toggle_play, image=self.images['play'])
         self.playButton.place(width=70, height=70, relx=0, rely=1, anchor='sw')
 
+        # generation counter
+        self.genCountC = Canvas(self.w, bg='black')
+        self.genCountC.place(x=70,y=self.height, width = 150, height=30, anchor='sw')
+        self.genCountC.create_rectangle(0,3,147,30,fill='#f0f0f0', outline='')
+        self.genText = self.genCountC.create_text(10,10,fill='black', font='Arial 10', text='Generation: 0', anchor='nw')
+
     # move highlighted square
     def move_cursor(self, event: Event):
         sx, sy = event.x, event.y
 
         # check mouse is not hovering on a button
-        if event.widget == self.playButton:
+        if event.widget in [self.playButton, self.genCountC]:
             # move blue cursor offscreen and shrink it
             self.mouseOnButton = True
             self.c.coords(-10,-10,-10,-10)
@@ -123,6 +129,9 @@ class GameWindow:
         # remove non-static features from last frame (cells)
         for cell in self.cells:
             self.c.delete(cell)
+        
+        # update generation counter
+        self.genCountC.itemconfig(self.genText, text=f'Generation: {self.grid.gens}')
 
         # draw cells
         # only in visible range

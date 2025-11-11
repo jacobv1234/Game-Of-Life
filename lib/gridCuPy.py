@@ -11,12 +11,15 @@ class Grid:
         self.grid = cp.zeros(self.gridsize**2, dtype='byte')
         self.grid = self.grid.reshape((self.gridsize,self.gridsize))
         self.rule = rule
+        self.gens = 0
     
     def toggle(self, x: int, y: int):
         self.grid[x][y] = 1 - self.grid[x][y]
+        self.gens = 0
         return self.grid[x][y]
 
     def set(self,x:int,y:int,s:int):
+        self.gens = 0
         self.grid[x][y] = s
 
 
@@ -25,5 +28,6 @@ class Grid:
         interleaved_state = cp.stack([self.grid, neighbour_counts], axis=2)
         newState = cp.apply_along_axis(self.rule.newState, 2, interleaved_state)
         self.grid = newState
+        self.gens += 1
     
         
