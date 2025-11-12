@@ -21,6 +21,11 @@ class Grid:
         self.gens = 0
         self.grid[x][y] = s
     
+    def reset(self):
+        self.grid = np.zeros(self.gridsize**2, dtype='byte')
+        self.grid = self.grid.reshape((self.gridsize,self.gridsize))
+        self.gens = 0
+    
     def next(self):
         # this version can't be better until using cupy
         neighbour_counts = convolve2d(self.grid, self.rule.n, mode='same', boundary=self.rule.edge, fillvalue=0)

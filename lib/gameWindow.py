@@ -31,7 +31,8 @@ class GameWindow:
         # load images
         self.images = {
             'play': PhotoImage(file='images/play.png'),
-            'pause': PhotoImage(file='images/pause.png')
+            'pause': PhotoImage(file='images/pause.png'),
+            'delete': PhotoImage(file='images/delete.png')
         }
 
 
@@ -57,11 +58,13 @@ class GameWindow:
         # buttons
         self.playButton = Button(self.w,border=5, command=self.toggle_play, image=self.images['play'])
         self.playButton.place(width=70, height=70, relx=0, rely=1, anchor='sw')
+        self.clearButton = Button(self.w, border=3, command=self.clear_screen, image=self.images['delete'])
+        self.clearButton.place(width=40, height=40, x=67, y=self.height-24, anchor='sw')
 
         # generation counter
         self.genCountC = Canvas(self.w, bg='black')
-        self.genCountC.place(x=70,y=self.height, width = 150, height=30, anchor='sw')
-        self.genCountC.create_rectangle(0,3,147,30,fill='#f0f0f0', outline='')
+        self.genCountC.place(x=70,y=self.height, width = 160, height=30, anchor='sw')
+        self.genCountC.create_rectangle(0,3,157,30,fill='#f0f0f0', outline='')
         self.genText = self.genCountC.create_text(10,10,fill='black', font='Arial 10', text='Generation: 0', anchor='nw')
 
     # move highlighted square
@@ -69,7 +72,7 @@ class GameWindow:
         sx, sy = event.x, event.y
 
         # check mouse is not hovering on a button
-        if event.widget in [self.playButton, self.genCountC]:
+        if event.widget in [self.playButton, self.genCountC, self.clearButton]:
             # move blue cursor offscreen and shrink it
             self.mouseOnButton = True
             self.c.coords(-10,-10,-10,-10)
@@ -119,6 +122,10 @@ class GameWindow:
         else:
             self.simulationOn = True
             self.playButton.config(image = self.images['pause'])
+    
+    # clear button clicked
+    def clear_screen(self):
+        self.grid.reset()
 
     
     def close_program(self):
