@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import PhotoImage
+from tkinter import messagebox
 
 from lib.gridlines import GridLines
 from lib.grid import Grid
@@ -125,7 +126,9 @@ class GameWindow:
     
     # clear button clicked
     def clear_screen(self):
-        self.grid.reset()
+        clear = messagebox.askokcancel('Clear screen', 'Are you sure you want to clear the screen?')
+        if clear:
+            self.grid.reset()
 
     
     def close_program(self):
