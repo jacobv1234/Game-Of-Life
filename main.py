@@ -8,7 +8,7 @@ from lib.rule import Rule
 grid = Grid(Rule())
 window = GameWindow(grid)
 
-
+ 
 
 # mainloop
 while window.running:
