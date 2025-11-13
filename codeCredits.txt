@@ -1,0 +1,8 @@
+SOURCES USED FOR CODE
+
+Basic GUI framework is a modified version of the framework used in
+https://github.com/jacobv1234/train-exploration-game
+this is my own code from a previous project and includes:
+- basic window construction
+- gameWindow.close_program and gameWindow.running for smooth program exit
+- frame rate lock with perf_counter()
