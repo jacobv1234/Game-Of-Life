@@ -7,7 +7,7 @@ from lib.ruleCuPy import Rule
 
 class Grid:
     def __init__(self, rule: Rule):
-        self.gridsize = 500
+        self.gridsize = 100
         self.grid = cp.zeros(self.gridsize**2, dtype='byte')
         self.grid = self.grid.reshape((self.gridsize,self.gridsize))
         self.rule = rule
@@ -21,6 +21,11 @@ class Grid:
     def set(self,x:int,y:int,s:int):
         self.gens = 0
         self.grid[x][y] = s
+    
+    def reset(self):
+        self.grid = cp.zeros(self.gridsize**2, dtype='byte')
+        self.grid = self.grid.reshape((self.gridsize,self.gridsize))
+        self.gens = 0
 
 
     def next(self):
