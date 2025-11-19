@@ -38,12 +38,15 @@ class GameWindow:
 
 
         # visible area tracking
-        self.left = 0
-        self.top = 0
+        self.t = 0
+        self.b = self.height
+        self.l = 0
+        self.r = self.width
         self.cellSize = 20
+        self.scrollSpeed = 30
 
         # gridlines
-        self.gridlines = GridLines(self.c, self.width, self.height)
+        self.gridlines = GridLines(self.c, self.width, self.height, self.cellSize)
 
         # cells
         self.cells = []
@@ -52,9 +55,16 @@ class GameWindow:
         self.cursor = self.c.create_rectangle(0,0,self.cellSize,self.cellSize, fill='', outline="#0000bd")
         self.curx = 0
         self.cury = 0
+
+        # bind controls
         self.c.bind_all('<Motion>', self.move_cursor)
         self.c.bind_all('<Button-1>', self.toggle_cell)
         self.c.bind_all('<B1-Motion>', self.drag_draw)
+        self.c.bind_all('<Up>', self.scroll_screen)
+        self.c.bind_all('<Down>', self.scroll_screen)
+        self.c.bind_all('<Left>', self.scroll_screen)
+        self.c.bind_all('<Right>', self.scroll_screen)
+
 
         # buttons
         self.playButton = Button(self.w,border=5, command=self.toggle_play, image=self.images['play'])
@@ -129,6 +139,47 @@ class GameWindow:
         clear = messagebox.askokcancel('Clear screen', 'Are you sure you want to clear the screen?')
         if clear:
             self.grid.reset()
+    
+    # scroll the screen when arrow keys are pressed
+    def scroll_screen(self, event: Event):
+        match event.keysym:
+            case 'Up':
+                self.c.yview_scroll(-self.scrollSpeed,'units')
+                prevEdge = self.t
+                self.t -= self.scrollSpeed
+                self.b -= self.scrollSpeed
+                self.gridlines.update_scroll_vertical(self.t,self.b,self.l,self.r,
+                                                        -self.scrollSpeed, prevEdge, self.cellSize)
+                self.c.tag_raise(self.cursor)
+
+            case 'Down':
+                self.c.yview_scroll(self.scrollSpeed,'units')
+                prevEdge = self.b
+                self.t += self.scrollSpeed
+                self.b += self.scrollSpeed
+                self.gridlines.update_scroll_vertical(self.t,self.b,self.l,self.r,
+                                                        self.scrollSpeed, prevEdge, self.cellSize)
+                self.c.tag_raise(self.cursor)
+                
+
+            case 'Left':
+                self.c.xview_scroll(-self.scrollSpeed,'units')
+                prevEdge = self.l
+                self.l -= self.scrollSpeed
+                self.r -= self.scrollSpeed
+                self.gridlines.update_scroll_horizontal(self.t,self.b,self.l,self.r,
+                                                        -self.scrollSpeed, prevEdge, self.cellSize)
+                self.c.tag_raise(self.cursor)
+
+            case 'Right':
+                self.c.xview_scroll(self.scrollSpeed,'units')
+                prevEdge = self.r
+                self.l += self.scrollSpeed
+                self.r += self.scrollSpeed
+                self.gridlines.update_scroll_horizontal(self.t,self.b,self.l,self.r,
+                                                        self.scrollSpeed, prevEdge, self.cellSize)
+                self.c.tag_raise(self.cursor)
+    
 
     
     def close_program(self):
@@ -145,8 +196,13 @@ class GameWindow:
 
         # draw cells
         # only in visible range
-        for x in range(self.left, self.left+self.width, self.cellSize):
-            for y in range(self.top, self.top+self.height, self.cellSize):
+        lGrid = self.l - self.l%self.cellSize
+        rGrid = self.r - self.r%self.cellSize + self.cellSize
+        tGrid = self.t - self.t%self.cellSize
+        bGrid = self.b - self.b%self.cellSize + self.cellSize
+
+        for x in range(lGrid, rGrid, self.cellSize):
+            for y in range(tGrid, bGrid, self.cellSize):
                 xi = int(x // self.cellSize)
                 yi = int(y // self.cellSize)
                 if self.grid.grid[xi][yi] == 1:
