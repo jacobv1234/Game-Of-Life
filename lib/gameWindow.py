@@ -94,6 +94,9 @@ class GameWindow:
             return
         
         x, y = self.c.canvasx(sx), self.c.canvasy(sy)
+        # skip if offscreen
+        if x < -self.screenLimit or x >= self.screenLimit or y < -self.screenLimit or y >= self.screenLimit:
+                    return
         # truncate to find cell
         self.curx = (x // self.cellSize) * self.cellSize
         self.cury = (y // self.cellSize) * self.cellSize
@@ -111,6 +114,9 @@ class GameWindow:
             return
 
         x, y = self.c.canvasx(sx), self.c.canvasy(sy)
+        # skip if offscreen
+        if x < -self.screenLimit or x >= self.screenLimit or y < -self.screenLimit or y >= self.screenLimit:
+                    return
         xo, yo = x + self.screenLimit, y + self.screenLimit
         xi = int(xo // self.cellSize)
         yi = int(yo // self.cellSize)
