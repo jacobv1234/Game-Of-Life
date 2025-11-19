@@ -44,6 +44,10 @@ class GameWindow:
         self.r = self.width
         self.cellSize = 20
         self.scrollSpeed = 30
+        self.screenLimit = (self.grid.gridsize // 2) * self.cellSize
+        self.scLimitBox = self.c.create_rectangle(-self.screenLimit+2, -self.screenLimit+2,
+                                                  self.screenLimit-2,self.screenLimit-2,
+                                                  fill='',outline='red')
 
         # gridlines
         self.gridlines = GridLines(self.c, self.width, self.height, self.cellSize)
@@ -107,8 +111,9 @@ class GameWindow:
             return
 
         x, y = self.c.canvasx(sx), self.c.canvasy(sy)
-        xi = int(x // self.cellSize)
-        yi = int(y // self.cellSize)
+        xo, yo = x + self.screenLimit, y + self.screenLimit
+        xi = int(xo // self.cellSize)
+        yi = int(yo // self.cellSize)
         self.dragState = self.grid.toggle(xi,yi)
     
     # click and drag to draw
@@ -120,8 +125,9 @@ class GameWindow:
             return
         
         x, y = self.c.canvasx(sx), self.c.canvasy(sy)
-        xi = int(x // self.cellSize)
-        yi = int(y // self.cellSize)
+        xo, yo = x + self.screenLimit, y + self.screenLimit
+        xi = int(xo // self.cellSize)
+        yi = int(yo // self.cellSize)
         self.grid.set(xi,yi,self.dragState)
     
 
@@ -144,41 +150,69 @@ class GameWindow:
     def scroll_screen(self, event: Event):
         match event.keysym:
             case 'Up':
-                self.c.yview_scroll(-self.scrollSpeed,'units')
                 prevEdge = self.t
                 self.t -= self.scrollSpeed
                 self.b -= self.scrollSpeed
+
+                # check if moved offscreen
+                scrolloffset = 0
+                if self.t < -self.screenLimit:
+                    scrolloffset = -self.screenLimit - self.t
+                    self.t += scrolloffset
+                    self.b += scrolloffset
+
                 self.gridlines.update_scroll_vertical(self.t,self.b,self.l,self.r,
-                                                        -self.scrollSpeed, prevEdge, self.cellSize)
-                self.c.tag_raise(self.cursor)
+                                                        -self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
+                self.c.yview_scroll(-self.scrollSpeed + scrolloffset,'units')
 
             case 'Down':
-                self.c.yview_scroll(self.scrollSpeed,'units')
                 prevEdge = self.b
                 self.t += self.scrollSpeed
                 self.b += self.scrollSpeed
+
+                # check if moved offscreen
+                scrolloffset = 0
+                if self.b > self.screenLimit:
+                    scrolloffset = self.screenLimit - self.b
+                    self.t += scrolloffset
+                    self.b += scrolloffset
+
                 self.gridlines.update_scroll_vertical(self.t,self.b,self.l,self.r,
-                                                        self.scrollSpeed, prevEdge, self.cellSize)
-                self.c.tag_raise(self.cursor)
+                                                        self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
+                self.c.yview_scroll(self.scrollSpeed + scrolloffset,'units')
                 
 
             case 'Left':
-                self.c.xview_scroll(-self.scrollSpeed,'units')
                 prevEdge = self.l
                 self.l -= self.scrollSpeed
                 self.r -= self.scrollSpeed
+
+                # check if moved offscreen
+                scrolloffset = 0
+                if self.l < -self.screenLimit:
+                    scrolloffset = -self.screenLimit - self.l
+                    self.l += scrolloffset
+                    self.r += scrolloffset
+
                 self.gridlines.update_scroll_horizontal(self.t,self.b,self.l,self.r,
-                                                        -self.scrollSpeed, prevEdge, self.cellSize)
-                self.c.tag_raise(self.cursor)
+                                                        -self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
+                self.c.xview_scroll(-self.scrollSpeed + scrolloffset,'units')
 
             case 'Right':
-                self.c.xview_scroll(self.scrollSpeed,'units')
                 prevEdge = self.r
                 self.l += self.scrollSpeed
                 self.r += self.scrollSpeed
+
+                # check if moved offscreen
+                scrolloffset = 0
+                if self.r > self.screenLimit:
+                    scrolloffset = self.screenLimit - self.r
+                    self.l += scrolloffset
+                    self.r += scrolloffset
+
                 self.gridlines.update_scroll_horizontal(self.t,self.b,self.l,self.r,
-                                                        self.scrollSpeed, prevEdge, self.cellSize)
-                self.c.tag_raise(self.cursor)
+                                                        self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
+                self.c.xview_scroll(self.scrollSpeed + scrolloffset,'units')
     
 
     
@@ -203,11 +237,18 @@ class GameWindow:
 
         for x in range(lGrid, rGrid, self.cellSize):
             for y in range(tGrid, bGrid, self.cellSize):
-                xi = int(x // self.cellSize)
-                yi = int(y // self.cellSize)
+                # skip if offscreen
+                if x < -self.screenLimit or x >= self.screenLimit or y < -self.screenLimit or y >= self.screenLimit:
+                    continue
+                # xo, yo hold the x and y coordinates offset to always be positive
+                xo, yo = x + self.screenLimit, y + self.screenLimit
+                xi = int(xo // self.cellSize)
+                yi = int(yo // self.cellSize)
                 if self.grid.grid[xi][yi] == 1:
                     self.cells.append(
                         self.c.create_rectangle(x,y, x+self.cellSize, y+self.cellSize, fill='black')
                     )
-
+        # layering
+        self.c.tag_raise(self.scLimitBox)
+        self.c.tag_raise(self.cursor)
         self.w.update()
