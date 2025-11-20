@@ -151,6 +151,8 @@ class GameWindow:
         clear = messagebox.askokcancel('Clear screen', 'Are you sure you want to clear the screen?')
         if clear:
             self.grid.reset()
+            self.simulationOn = False
+            self.playButton.config(image = self.images['play'])
     
     # scroll the screen when arrow keys are pressed
     def scroll_screen(self, event: Event):
