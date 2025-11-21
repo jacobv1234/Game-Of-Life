@@ -6,7 +6,7 @@ from lib.rule import Rule
 
 class Grid:
     def __init__(self, rule: Rule):
-        self.gridsize = 500
+        self.gridsize = 512
         self.grid = np.zeros(self.gridsize**2, dtype='byte')
         self.grid = self.grid.reshape((self.gridsize,self.gridsize))
         self.rule = rule

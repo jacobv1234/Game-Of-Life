@@ -4,6 +4,7 @@ from tkinter import messagebox
 
 from lib.gridlines import GridLines
 from lib.grid import Grid
+from lib.viewfinder import ViewFinder
 
 class GameWindow:
     def __init__(self, grid: Grid):
@@ -51,6 +52,7 @@ class GameWindow:
                                                   self.screenLimit-2,self.screenLimit-2,
                                                   fill='',outline='red')
         self.zoomLevels = [5,10,15,20,30,40]
+        self.viewFinder = ViewFinder(self.w,self.screenLimit,self.l,self.r,self.t,self.b)
 
         # gridlines
         self.gridlines = GridLines(self.c, self.l,self.r,self.t,self.b, self.cellSize)
@@ -79,9 +81,9 @@ class GameWindow:
         self.clearButton = Button(self.w, border=3, command=self.clear_screen, image=self.images['delete'])
         self.clearButton.place(width=40, height=40, x=67, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
-        self.zoomOutButton.place(x=self.width,y=self.height,width=40,height=40,anchor='se')
+        self.zoomOutButton.place(x=self.width-140,y=self.height,width=40,height=40,anchor='se')
         self.zoomInButton = Button(self.w, border=5, command=self.zoomIn, image=self.images['zoomIn'])
-        self.zoomInButton.place(x=self.width,y=self.height-40,width=40,height=40,anchor='se')
+        self.zoomInButton.place(x=self.width-140,y=self.height-40,width=40,height=40,anchor='se')
 
         # generation counter
         self.genCountC = Canvas(self.w, bg='black')
@@ -94,7 +96,8 @@ class GameWindow:
         sx, sy = event.x, event.y
 
         # check mouse is not hovering on a button
-        if event.widget in [self.playButton, self.genCountC, self.clearButton, self.zoomInButton,self.zoomOutButton]:
+        if event.widget in [self.playButton, self.genCountC, self.clearButton,
+                            self.zoomInButton, self.zoomOutButton, self.viewFinder.c]:
             # move blue cursor offscreen and shrink it
             self.mouseOnButton = True
             self.c.coords(-10,-10,-10,-10)
@@ -228,6 +231,8 @@ class GameWindow:
                 self.gridlines.update_scroll_horizontal(self.t,self.b,self.l,self.r,
                                                         self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
                 self.c.xview_scroll(int(self.scrollSpeed + scrolloffset),'units')
+        
+        self.viewFinder.update(self.screenLimit, self.l,self.r,self.t,self.b)
     
 
     def zoomIn(self):
@@ -264,6 +269,8 @@ class GameWindow:
         self.scLimitBox = self.c.create_rectangle(-self.screenLimit+2, -self.screenLimit+2,
                                                   self.screenLimit-2,self.screenLimit-2,
                                                   fill='',outline='red')
+        
+        self.viewFinder.update(self.screenLimit, self.l,self.r,self.t,self.b)
     
 
     def zoomOut(self):
@@ -300,6 +307,8 @@ class GameWindow:
         self.scLimitBox = self.c.create_rectangle(-self.screenLimit+2, -self.screenLimit+2,
                                                   self.screenLimit-2,self.screenLimit-2,
                                                   fill='',outline='red')
+        
+        self.viewFinder.update(self.screenLimit, self.l,self.r,self.t,self.b)
 
     
     def close_program(self):
