@@ -7,9 +7,9 @@ class GridLines:
         self.hlines = []
         self.vlines = []
 
-        # don't gridlines if too dense
+        # draw every 5th gridline if too dense
         if size <= 10:
-            return
+            size *= 5
         
         # next / last mutiples of sides
         lm = l-l%size
@@ -29,9 +29,9 @@ class GridLines:
     
     # fix the gridlines to still make sense when scrolling horizontally
     def update_scroll_horizontal(self,t,b,l,r, scrollSpeed, prevEdge, size):
-        # don't draw gridlines if too dense
+        # draw every 5th gridline if too dense
         if size <= 10:
-            return
+            size *= 5
         # remove offscreen vertical lines
         for i in range(len(self.vlines)-1,-1,-1):
             line = self.vlines[i]
@@ -56,9 +56,9 @@ class GridLines:
         
     # fix the gridlines to still make sense when scrolling vertically
     def update_scroll_vertical(self,t,b,l,r, scrollSpeed, prevEdge, size):
-        # don't draw gridlines if too dense
+        # draw every 5th gridline if too dense
         if size <= 10:
-            return
+            size *= 5
         # remove offscreen horizontal lines
         for i in range(len(self.hlines)-1,-1,-1):
             line = self.hlines[i]
