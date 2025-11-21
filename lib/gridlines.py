@@ -2,23 +2,36 @@ from tkinter import *
 from lib.gridline import GridLine
 
 class GridLines:
-    def __init__(self, c: Canvas, w:int, h:int, size:int = 20):
+    def __init__(self, c: Canvas, l,r,t,b, size:int = 20):
         self.c = c
         self.hlines = []
         self.vlines = []
 
-        for i in range(0, h, size):
+        # don't draw gridlines if too dense
+        if size <= 10:
+            return
+        
+        # next / last mutiples of sides
+        lm = l-l%size
+        rm = r-r%size+size
+        tm = t-t%size
+        bm = b-b%size+size
+
+        for i in range(tm, bm, size):
             self.hlines.append(
-                GridLine(c,i,0,w,'h')
+                GridLine(c,i,lm,rm,'h')
             )
 
-        for i in range(0, w, size):
+        for i in range(l-l%size, r-r%size+size, size):
             self.vlines.append(
-                GridLine(c,i,0,h,'v')
+                GridLine(c,i,tm,bm,'v')
             )
     
     # fix the gridlines to still make sense when scrolling horizontally
     def update_scroll_horizontal(self,t,b,l,r, scrollSpeed, prevEdge, size):
+        # don't draw gridlines if too dense
+        if size <= 10:
+            return
         # remove offscreen vertical lines
         for i in range(len(self.vlines)-1,-1,-1):
             line = self.vlines[i]
@@ -43,6 +56,9 @@ class GridLines:
         
     # fix the gridlines to still make sense when scrolling vertically
     def update_scroll_vertical(self,t,b,l,r, scrollSpeed, prevEdge, size):
+        # don't draw gridlines if too dense
+        if size <= 10:
+            return
         # remove offscreen horizontal lines
         for i in range(len(self.hlines)-1,-1,-1):
             line = self.hlines[i]

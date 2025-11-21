@@ -48,9 +48,10 @@ class GameWindow:
         self.scLimitBox = self.c.create_rectangle(-self.screenLimit+2, -self.screenLimit+2,
                                                   self.screenLimit-2,self.screenLimit-2,
                                                   fill='',outline='red')
+        self.zoomLevels = [5,10,15,20,30,40]
 
         # gridlines
-        self.gridlines = GridLines(self.c, self.width, self.height, self.cellSize)
+        self.gridlines = GridLines(self.c, self.l,self.r,self.t,self.b, self.cellSize)
 
         # cells
         self.cells = []
@@ -75,6 +76,10 @@ class GameWindow:
         self.playButton.place(width=70, height=70, relx=0, rely=1, anchor='sw')
         self.clearButton = Button(self.w, border=3, command=self.clear_screen, image=self.images['delete'])
         self.clearButton.place(width=40, height=40, x=67, y=self.height-24, anchor='sw')
+        self.zoomOutButton = Button(self.w,border=5,command=self.zoomOut)
+        self.zoomOutButton.place(x=self.width,y=self.height,width=40,height=40,anchor='se')
+        self.zoomInButton = Button(self.w,border=5,command=self.zoomIn)
+        self.zoomInButton.place(x=self.width,y=self.height-40,width=40,height=40,anchor='se')
 
         # generation counter
         self.genCountC = Canvas(self.w, bg='black')
@@ -87,7 +92,7 @@ class GameWindow:
         sx, sy = event.x, event.y
 
         # check mouse is not hovering on a button
-        if event.widget in [self.playButton, self.genCountC, self.clearButton]:
+        if event.widget in [self.playButton, self.genCountC, self.clearButton, self.zoomInButton,self.zoomOutButton]:
             # move blue cursor offscreen and shrink it
             self.mouseOnButton = True
             self.c.coords(-10,-10,-10,-10)
@@ -171,7 +176,7 @@ class GameWindow:
 
                 self.gridlines.update_scroll_vertical(self.t,self.b,self.l,self.r,
                                                         -self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
-                self.c.yview_scroll(-self.scrollSpeed + scrolloffset,'units')
+                self.c.yview_scroll(int(-self.scrollSpeed + scrolloffset),'units')
 
             case 'Down':
                 prevEdge = self.b
@@ -187,7 +192,7 @@ class GameWindow:
 
                 self.gridlines.update_scroll_vertical(self.t,self.b,self.l,self.r,
                                                         self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
-                self.c.yview_scroll(self.scrollSpeed + scrolloffset,'units')
+                self.c.yview_scroll(int(self.scrollSpeed + scrolloffset),'units')
                 
 
             case 'Left':
@@ -204,7 +209,7 @@ class GameWindow:
 
                 self.gridlines.update_scroll_horizontal(self.t,self.b,self.l,self.r,
                                                         -self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
-                self.c.xview_scroll(-self.scrollSpeed + scrolloffset,'units')
+                self.c.xview_scroll(int(-self.scrollSpeed + scrolloffset),'units')
 
             case 'Right':
                 prevEdge = self.r
@@ -220,8 +225,79 @@ class GameWindow:
 
                 self.gridlines.update_scroll_horizontal(self.t,self.b,self.l,self.r,
                                                         self.scrollSpeed + scrolloffset, prevEdge, self.cellSize)
-                self.c.xview_scroll(self.scrollSpeed + scrolloffset,'units')
+                self.c.xview_scroll(int(self.scrollSpeed + scrolloffset),'units')
     
+
+    def zoomIn(self):
+        # get new zoom values
+        zoomIndex = self.zoomLevels.index(self.cellSize)
+        zoomIndex += 1
+        if zoomIndex >= len(self.zoomLevels):
+            return
+        newZoom = self.zoomLevels[zoomIndex]
+        zMult = newZoom / self.cellSize
+
+        # adjust screen edges
+        oldxc = (self.r + self.l)/2
+        oldyc = (self.b + self.t)/2
+        xc = oldxc*zMult
+        yc = oldyc*zMult
+        self.l = int(xc - self.width/2)
+        self.r = int(xc + self.width/2)
+        self.t = int(yc - self.height/2)
+        self.b = int(yc + self.height/2)
+
+        # physically move the screen
+        self.c.xview_scroll(int(xc-oldxc),'units')
+        self.c.yview_scroll(int(yc-oldyc),'units')
+
+        # recreate the grid
+        self.gridlines.remove()
+        self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,newZoom)
+
+        # update self parameters
+        self.cellSize = newZoom
+        self.screenLimit = (self.grid.gridsize // 2) * self.cellSize
+        self.c.delete(self.scLimitBox)
+        self.scLimitBox = self.c.create_rectangle(-self.screenLimit+2, -self.screenLimit+2,
+                                                  self.screenLimit-2,self.screenLimit-2,
+                                                  fill='',outline='red')
+    
+
+    def zoomOut(self):
+        # get new zoom values
+        zoomIndex = self.zoomLevels.index(self.cellSize)
+        zoomIndex -= 1
+        if zoomIndex < 0:
+            return
+        newZoom = self.zoomLevels[zoomIndex]
+        zMult = newZoom / self.cellSize
+
+        # adjust screen edges
+        oldxc = (self.r + self.l)/2
+        oldyc = (self.b + self.t)/2
+        xc = oldxc*zMult
+        yc = oldyc*zMult
+        self.l = int(xc - self.width/2)
+        self.r = int(xc + self.width/2)
+        self.t = int(yc - self.height/2)
+        self.b = int(yc + self.height/2)
+
+        # physically move the screen
+        self.c.xview_scroll(int(xc-oldxc),'units')
+        self.c.yview_scroll(int(yc-oldyc),'units')
+
+        # recreate the grid
+        self.gridlines.remove()
+        self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,newZoom)
+
+        # update self parameters
+        self.cellSize = newZoom
+        self.screenLimit = (self.grid.gridsize // 2) * self.cellSize
+        self.c.delete(self.scLimitBox)
+        self.scLimitBox = self.c.create_rectangle(-self.screenLimit+2, -self.screenLimit+2,
+                                                  self.screenLimit-2,self.screenLimit-2,
+                                                  fill='',outline='red')
 
     
     def close_program(self):
