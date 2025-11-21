@@ -33,7 +33,9 @@ class GameWindow:
         self.images = {
             'play': PhotoImage(file='images/play.png'),
             'pause': PhotoImage(file='images/pause.png'),
-            'delete': PhotoImage(file='images/delete.png')
+            'delete': PhotoImage(file='images/delete.png'),
+            'zoomIn': PhotoImage(file='images/zoomIn.png'),
+            'zoomOut': PhotoImage(file='images/zoomOut.png')
         }
 
 
@@ -72,13 +74,13 @@ class GameWindow:
 
 
         # buttons
-        self.playButton = Button(self.w,border=5, command=self.toggle_play, image=self.images['play'])
+        self.playButton = Button(self.w, border=5, command=self.toggle_play, image=self.images['play'])
         self.playButton.place(width=70, height=70, relx=0, rely=1, anchor='sw')
         self.clearButton = Button(self.w, border=3, command=self.clear_screen, image=self.images['delete'])
         self.clearButton.place(width=40, height=40, x=67, y=self.height-24, anchor='sw')
-        self.zoomOutButton = Button(self.w,border=5,command=self.zoomOut)
+        self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
         self.zoomOutButton.place(x=self.width,y=self.height,width=40,height=40,anchor='se')
-        self.zoomInButton = Button(self.w,border=5,command=self.zoomIn)
+        self.zoomInButton = Button(self.w, border=5, command=self.zoomIn, image=self.images['zoomIn'])
         self.zoomInButton.place(x=self.width,y=self.height-40,width=40,height=40,anchor='se')
 
         # generation counter

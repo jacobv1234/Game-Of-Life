@@ -7,7 +7,7 @@ class GridLines:
         self.hlines = []
         self.vlines = []
 
-        # don't draw gridlines if too dense
+        # don't gridlines if too dense
         if size <= 10:
             return
         
