@@ -81,13 +81,13 @@ class GameWindow:
         self.clearButton = Button(self.w, border=3, command=self.clear_screen, image=self.images['delete'])
         self.clearButton.place(width=40, height=40, x=67, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
-        self.zoomOutButton.place(x=self.width-140,y=self.height,width=40,height=40,anchor='se')
+        self.zoomOutButton.place(x=self.width-140,y=self.height+4,width=40,height=40,anchor='se')
         self.zoomInButton = Button(self.w, border=5, command=self.zoomIn, image=self.images['zoomIn'])
-        self.zoomInButton.place(x=self.width-140,y=self.height-40,width=40,height=40,anchor='se')
+        self.zoomInButton.place(x=self.width-140,y=self.height-36,width=40,height=40,anchor='se')
 
         # generation counter
         self.genCountC = Canvas(self.w, bg='black')
-        self.genCountC.place(x=70,y=self.height, width = 230, height=30, anchor='sw')
+        self.genCountC.place(x=70,y=self.height+4, width = 230, height=30, anchor='sw')
         self.genCountC.create_rectangle(0,3,227,30,fill='#f0f0f0', outline='')
         self.genText = self.genCountC.create_text(10,10,fill='black', font='Arial 10', text='Generation: 0', anchor='nw')
         self.popText = self.genCountC.create_text(120,10,fill='black', font='Arial 10', text='Population: 0', anchor='nw')
