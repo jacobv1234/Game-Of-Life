@@ -5,6 +5,7 @@ from tkinter import messagebox
 from lib.gridlines import GridLines
 from lib.grid import Grid
 from lib.viewfinder import ViewFinder
+from lib.ruleModifier import getNewRule
 
 class GameWindow:
     def __init__(self, grid: Grid):
@@ -36,7 +37,8 @@ class GameWindow:
             'pause': PhotoImage(file='images/pause.png'),
             'delete': PhotoImage(file='images/delete.png'),
             'zoomIn': PhotoImage(file='images/zoomIn.png'),
-            'zoomOut': PhotoImage(file='images/zoomOut.png')
+            'zoomOut': PhotoImage(file='images/zoomOut.png'),
+            'gear': PhotoImage(file='images/gear.png')
         }
 
 
@@ -80,6 +82,8 @@ class GameWindow:
         self.playButton.place(width=70, height=70, relx=0, rely=1, anchor='sw')
         self.clearButton = Button(self.w, border=3, command=self.clear_screen, image=self.images['delete'])
         self.clearButton.place(width=40, height=40, x=67, y=self.height-24, anchor='sw')
+        self.ruleButton = Button(self.w, border=3, command=self.change_rules, image=self.images['gear'])
+        self.ruleButton.place(width=40, height=40, x=107, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
         self.zoomOutButton.place(x=self.width-140,y=self.height+4,width=40,height=40,anchor='se')
         self.zoomInButton = Button(self.w, border=5, command=self.zoomIn, image=self.images['zoomIn'])
@@ -96,14 +100,14 @@ class GameWindow:
     def move_cursor(self, event: Event):
         sx, sy = event.x, event.y
 
-        # check mouse is not hovering on a button
-        if event.widget in [self.playButton, self.genCountC, self.clearButton,
-                            self.zoomInButton, self.zoomOutButton, self.viewFinder.c]:
-            # move blue cursor offscreen and shrink it
+        # check mouse is on main grid
+        if event.widget != self.c:
+            # hide cursor
             self.mouseOnButton = True
-            self.c.coords(-10,-10,-10,-10)
+            self.c.itemconfig(self.cursor, state='hidden')
             return
         
+        self.c.itemconfig(self.cursor, state='normal')
         x, y = self.c.canvasx(sx), self.c.canvasy(sy)
         # skip if offscreen
         if x < -self.screenLimit or x >= self.screenLimit or y < -self.screenLimit or y >= self.screenLimit:
@@ -164,6 +168,10 @@ class GameWindow:
             self.grid.reset()
             self.simulationOn = False
             self.playButton.config(image = self.images['play'])
+    
+    # rule modification button pressed
+    def change_rules(self):
+        getNewRule(self.w, self.grid.rule)
     
     # scroll the screen when arrow keys are pressed
     def scroll_screen(self, event: Event):

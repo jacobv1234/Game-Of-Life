@@ -1,0 +1,12 @@
+{
+    "name": "Conway's Game of Life (default)",
+    "born": [3],
+    "survive": [2,3],
+    "edge": "fill",
+    "neighbourhood": [
+        [1,1,1],
+        [1,0,1],
+        [1,1,1]
+    ],
+    "hexagonal": false
+}
