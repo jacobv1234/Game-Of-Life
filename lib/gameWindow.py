@@ -168,10 +168,17 @@ class GameWindow:
             self.grid.reset()
             self.simulationOn = False
             self.playButton.config(image = self.images['play'])
+        return clear
     
     # rule modification button pressed
     def change_rules(self):
-        getNewRule(self.w, self.grid.rule)
+        screen_cleared = self.clear_screen()
+        if screen_cleared == False:
+            return
+        self.update()
+        rule = getNewRule(self.w, self.grid.rule)
+        self.grid.changeRule(rule) #type:ignore
+
     
     # scroll the screen when arrow keys are pressed
     def scroll_screen(self, event: Event):

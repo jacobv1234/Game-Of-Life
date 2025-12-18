@@ -38,4 +38,7 @@ class Grid:
         self.grid = newState
         self.gens += 1
         self.population = np.sum(self.grid)
+    
+    def changeRule(self, rule: Rule):
+        self.rule = rule
         
