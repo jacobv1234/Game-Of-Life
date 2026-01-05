@@ -3,6 +3,7 @@ from tkinter import PhotoImage
 from tkinter import messagebox
 
 from lib.gridlines import GridLines
+from lib.hexgrid import HexGrid
 from lib.grid import Grid
 from lib.viewfinder import ViewFinder
 from lib.ruleModifier import getNewRule
@@ -178,6 +179,11 @@ class GameWindow:
         self.update()
         rule = getNewRule(self.w, self.grid.rule)
         self.grid.changeRule(rule) #type:ignore
+        self.gridlines.remove()
+        if self.grid.rule.hex == True:
+            self.gridlines = HexGrid(self.c,self.l,self.r,self.t,self.b,self.cellSize)
+        else:    
+            self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,self.cellSize)
 
     
     # scroll the screen when arrow keys are pressed
@@ -276,7 +282,10 @@ class GameWindow:
 
         # recreate the grid
         self.gridlines.remove()
-        self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,newZoom)
+        if self.grid.rule.hex == True:
+            self.gridlines = HexGrid(self.c,self.l,self.r,self.t,self.b,newZoom)
+        else:    
+            self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,newZoom)
 
         # update self parameters
         self.cellSize = newZoom
@@ -314,7 +323,10 @@ class GameWindow:
 
         # recreate the grid
         self.gridlines.remove()
-        self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,newZoom)
+        if self.grid.rule.hex == True:
+            self.gridlines = HexGrid(self.c,self.l,self.r,self.t,self.b,newZoom)
+        else:    
+            self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,newZoom)
 
         # update self parameters
         self.cellSize = newZoom
