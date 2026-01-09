@@ -113,9 +113,17 @@ class GameWindow:
         # skip if offscreen
         if x < -self.screenLimit or x >= self.screenLimit or y < -self.screenLimit or y >= self.screenLimit:
                     return
+        
         # truncate to find cell
-        self.curx = (x // self.cellSize) * self.cellSize
-        self.cury = (y // self.cellSize) * self.cellSize
+        if self.grid.rule.hex == True:
+            self.curx = (x // self.cellSize) * self.cellSize
+            if self.curx / self.cellSize % 2 == 1:
+                self.cury = ((y - (self.cellSize//2)) // self.cellSize + 0.5) * self.cellSize
+            else:
+                self.cury = (y // self.cellSize) * self.cellSize
+        else:
+            self.curx = (x // self.cellSize) * self.cellSize
+            self.cury = (y // self.cellSize) * self.cellSize
         # move cursor
         self.c.coords(self.cursor, self.curx, self.cury, self.curx+self.cellSize, self.cury+self.cellSize)
         self.mouseOnButton = False
@@ -133,7 +141,10 @@ class GameWindow:
         # skip if offscreen
         if x < -self.screenLimit or x >= self.screenLimit or y < -self.screenLimit or y >= self.screenLimit:
                     return
-        xo, yo = x + self.screenLimit, y + self.screenLimit
+        if self.grid.rule.hex == True:
+            xo, yo = x + self.screenLimit, (y + self.screenLimit + (x-x%self.cellSize)//2)
+        else:
+            xo, yo = x + self.screenLimit, y + self.screenLimit
         xi = int(xo // self.cellSize)
         yi = int(yo // self.cellSize)
         self.dragState = self.grid.toggle(xi,yi)
@@ -147,7 +158,10 @@ class GameWindow:
             return
         
         x, y = self.c.canvasx(sx), self.c.canvasy(sy)
-        xo, yo = x + self.screenLimit, y + self.screenLimit
+        if self.grid.rule.hex == True:
+            xo, yo = x + self.screenLimit, (y + self.screenLimit + (x-x%self.cellSize)//2)
+        else:
+            xo, yo = x + self.screenLimit, y + self.screenLimit
         xi = int(xo // self.cellSize)
         yi = int(yo // self.cellSize)
         self.grid.set(xi,yi,self.dragState)
@@ -365,13 +379,21 @@ class GameWindow:
                 if x < -self.screenLimit or x >= self.screenLimit or y < -self.screenLimit or y >= self.screenLimit:
                     continue
                 # xo, yo hold the x and y coordinates offset to always be positive
-                xo, yo = x + self.screenLimit, y + self.screenLimit
+                if self.grid.rule.hex == True:
+                    xo, yo = x + self.screenLimit, (y + self.screenLimit + (x-x%self.cellSize)//2)
+                else:
+                    xo, yo = x + self.screenLimit, y + self.screenLimit
                 xi = int(xo // self.cellSize)
                 yi = int(yo // self.cellSize)
                 if self.grid.grid[xi][yi] == 1:
-                    self.cells.append(
-                        self.c.create_rectangle(x,y, x+self.cellSize, y+self.cellSize, fill='black')
-                    )
+                    if self.grid.rule.hex == True and xi%2 == 1:
+                        self.cells.append(
+                            self.c.create_rectangle(x,y-self.cellSize//2, x+self.cellSize, y+self.cellSize-self.cellSize//2, fill='black')
+                        )
+                    else:
+                        self.cells.append(
+                            self.c.create_rectangle(x,y, x+self.cellSize, y+self.cellSize, fill='black')
+                        )
         # layering
         self.c.tag_raise(self.scLimitBox)
         self.c.tag_raise(self.cursor)

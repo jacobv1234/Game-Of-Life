@@ -1,5 +1,6 @@
 - Update gridlines to be able to draw offset squares            done
-- Update cursor to be able to select hexagonally
-- Update gameWindow.update() to work with offset squares
+- Update cursor to be able to select hexagonally                done
+- Update draw functions to update the grid correctly            done
+- Update gameWindow.update() to work with offset squares        done
 - Modify boundary calculation in hexagonal mode
 - Modify viewfinder to make sense on a parallelogram grid
