@@ -1,6 +1,13 @@
-- Update gridlines to be able to draw offset squares            done
-- Update cursor to be able to select hexagonally                done
-- Update draw functions to update the grid correctly            done
-- Update gameWindow.update() to work with offset squares        done
-- Modify boundary calculation in hexagonal mode
-- Modify viewfinder to make sense on a parallelogram grid
+known hex patterns (Bays rules)
+
+2 adjacent - hex-blinker (period 2)
+
+6 in a circle - hex-pulsar (period 3)
+
+start with 6 in a circle, remove 2 adjacent - worm (period 4)
+
+start with 6 in a circle, remove alternating - spinner (period 2)
+
+hexagon with side length 4 - large hex oscillator (period 15)
+
+Bays hexship (period 5, moves 1 cell orthogonally) - see paper

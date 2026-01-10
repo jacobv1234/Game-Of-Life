@@ -173,6 +173,12 @@ class RuleModifier:
 def getNewRule(window, rule):
     ruleWindow = RuleModifier(window, rule)
     while ruleWindow.output == -1:
+        # force wraparound state to be on if hexagonal is on
+        if ruleWindow.hexValue.get() == True:
+            ruleWindow.wrapCheckBox.config(state='disabled')
+            ruleWindow.wrapValue.set('wrap')
+        else:
+            ruleWindow.wrapCheckBox.config(state='normal')
         window.update()
         sleep(0.01)
     

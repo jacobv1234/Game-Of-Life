@@ -145,8 +145,8 @@ class GameWindow:
             xo, yo = x + self.screenLimit, (y + self.screenLimit + (x-x%self.cellSize)//2)
         else:
             xo, yo = x + self.screenLimit, y + self.screenLimit
-        xi = int(xo // self.cellSize)
-        yi = int(yo // self.cellSize)
+        xi = int(xo // self.cellSize) % self.grid.gridsize
+        yi = int(yo // self.cellSize) % self.grid.gridsize
         self.dragState = self.grid.toggle(xi,yi)
     
     # click and drag to draw
@@ -162,8 +162,8 @@ class GameWindow:
             xo, yo = x + self.screenLimit, (y + self.screenLimit + (x-x%self.cellSize)//2)
         else:
             xo, yo = x + self.screenLimit, y + self.screenLimit
-        xi = int(xo // self.cellSize)
-        yi = int(yo // self.cellSize)
+        xi = int(xo // self.cellSize) % self.grid.gridsize
+        yi = int(yo // self.cellSize) % self.grid.gridsize
         self.grid.set(xi,yi,self.dragState)
     
 
@@ -383,8 +383,8 @@ class GameWindow:
                     xo, yo = x + self.screenLimit, (y + self.screenLimit + (x-x%self.cellSize)//2)
                 else:
                     xo, yo = x + self.screenLimit, y + self.screenLimit
-                xi = int(xo // self.cellSize)
-                yi = int(yo // self.cellSize)
+                xi = int(xo // self.cellSize) % self.grid.gridsize
+                yi = int(yo // self.cellSize) % self.grid.gridsize
                 if self.grid.grid[xi][yi] == 1:
                     if self.grid.rule.hex == True and xi%2 == 1:
                         self.cells.append(

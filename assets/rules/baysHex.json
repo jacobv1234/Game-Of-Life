@@ -1,0 +1,12 @@
+{
+    "name": "Carter Bays' Hexagonal Life",
+    "born": [2],
+    "survive": [3,5],
+    "edge": "wrap",
+    "neighbourhood": [
+        [1,1,0],
+        [1,0,1],
+        [0,1,1]
+    ],
+    "hexagonal": true
+}
