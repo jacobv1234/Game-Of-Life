@@ -13,6 +13,7 @@ print(f'Max threads per block: {gpu.MAX_BLOCK_DIM_X} x {gpu.MAX_BLOCK_DIM_Y} x {
 @cuda.jit   # equivalent to __global__
 def addArrays(a,b,c):
     # access threadIdx and blockDim via cuda
+    # type 'property' instead of 'int' : vscode HATES you doing stuff with it 
     i = cuda.threadIdx.x
 
     # result must be stored in an argument as no return value

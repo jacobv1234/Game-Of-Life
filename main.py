@@ -1,8 +1,8 @@
 from time import sleep, perf_counter
 
 from lib.gameWindow import GameWindow
-from lib.grid import Grid
-from lib.rule import Rule
+from lib.gridGPU import Grid
+from lib.ruleGPU import Rule
 
 # create instances of classes
 grid = Grid(Rule())

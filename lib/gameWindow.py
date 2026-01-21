@@ -4,7 +4,7 @@ from tkinter import messagebox
 
 from lib.gridlines import GridLines
 from lib.hexgrid import HexGrid
-from lib.grid import Grid
+from lib.gridGPU import Grid
 from lib.viewfinder import ViewFinder
 from lib.ruleModifier import getNewRule
 
