@@ -33,16 +33,18 @@ class Grid:
     
     # NEXT GENERATION - GPU EDITION
     def next(self):
-        # this version can't be better until using cupy
-        #neighbour_counts = convolve2d(self.grid, self.rule.n, mode='same', boundary=self.rule.edge, fillvalue=0)
-        #interleaved_state = np.stack([self.grid, neighbour_counts], axis=2)
-        #newState = np.apply_along_axis(self.rule.newState, 2, interleaved_state)
-        #self.grid = newState
-        #self.gens += 1
-        #self.population = np.sum(self.grid)
-        blocks = 1
-        threads = (self.gridsize,self.gridsize)
-        nextGPU[blocks,threads](self.grid, self.rule.b, self.rule.s, self.rule.n, self.rule.edge, self.gridsize) # type: ignore
+        blocks = (self.gridsize,self.gridsize)
+        threads = 1
+        newState = np.zeros(shape=(self.gridsize,self.gridsize))
+        nextGPU[blocks,threads](self.grid,   # type: ignore
+                                np.asarray(self.rule.b),
+                                np.asarray(self.rule.s),
+                                np.asarray(self.rule.n),
+                                int(self.rule.edge=='wrap'),
+                                self.gridsize, newState)
+        self.grid = newState
+        self.gens += 1
+        self.population = np.sum(self.grid)
 
     
 

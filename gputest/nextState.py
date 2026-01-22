@@ -2,6 +2,7 @@
 import numpy as np
 import numba as nb
 import numba.cuda as cuda
+from time import sleep
 
 
 # Rule cant be passed in directly
@@ -45,3 +46,27 @@ def nextGPU(state: np.ndarray, b: np.ndarray, s: np.ndarray, n: np.ndarray, edge
             if s[i] == count:
                 newState[y,x] = 1
                 break
+
+# testing
+if __name__ == '__main__':
+    state = np.asarray([
+        [0,0,0,0,0],
+        [0,0,1,0,0],
+        [0,0,0,1,0],
+        [0,1,1,1,0],
+        [0,0,0,0,0]
+    ])
+
+    blocks = (5,5)
+    threads = 1
+    for i in range(100):
+        new_state = np.zeros(shape=(5,5),dtype=np.int8)
+        nextGPU[blocks,threads](state,  # type: ignore
+                                np.asarray([3]), np.asarray([2,3]), 
+                                np.asarray([[1,1,1],[1,0,1],[1,1,1]]), 
+                                1, 5,
+                                new_state)
+
+        print(new_state)
+        state = new_state
+        sleep(0.5)
