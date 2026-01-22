@@ -8,6 +8,13 @@ start with 6 in a circle, remove 2 adjacent - worm (period 4)
 
 start with 6 in a circle, remove alternating - spinner (period 2)
 
+3 in a close triangle - triangle (period 2)
+
+0-0
+0--
+--0
+across three columns - :/ (period 2)
+
 hexagon with side length 4 - large hex oscillator (period 15)
 
 Bays hexship (period 5, moves 1 cell orthogonally) - see paper
