@@ -7,3 +7,7 @@ this is my own code from a previous project and includes:
 - gameWindow.close_program() and gameWindow.running for smooth program exit
 - frame rate lock with perf_counter()
 - compiler.py with nuitka
+
+
+https://www.geeksforgeeks.org/python/how-to-embed-matplotlib-charts-in-tkinter-gui/
+- populationGraph.py (basic graph creation)

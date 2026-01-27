@@ -13,23 +13,27 @@ class Grid:
         self.rule = rule
         self.gens = 0
         self.population = 0
+        self.population_history = [0]
     
     def toggle(self, x: int, y: int):
         self.grid[x][y] = 1 - self.grid[x][y]
         self.gens = 0
-        self.population = np.sum(self.grid)
+        self.population = int(np.sum(self.grid))
+        self.population_history = [self.population]
         return self.grid[x][y]
 
     def set(self,x:int,y:int,s:int):
         self.gens = 0
-        self.population = np.sum(self.grid)
         self.grid[x][y] = s
+        self.population = int(np.sum(self.grid))
+        self.population_history = [self.population]
     
     def reset(self):
         self.grid = np.zeros(self.gridsize**2, dtype='byte')
         self.grid = self.grid.reshape((self.gridsize,self.gridsize))
         self.gens = 0
         self.population = 0
+        self.population_history = [0]
     
     # NEXT GENERATION - GPU EDITION
     def next(self):
@@ -44,7 +48,8 @@ class Grid:
                                 self.gridsize, newState)
         self.grid = newState
         self.gens += 1
-        self.population = np.sum(self.grid)
+        self.population = int(np.sum(self.grid))
+        self.population_history.append(self.population)
 
     
 

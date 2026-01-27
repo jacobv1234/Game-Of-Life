@@ -103,12 +103,12 @@ class RuleModifier:
         xi,yi = x//50, y//50
 
         # self.neighbours is updated upside down because of the convolution
-        current_state = self.neighbours[2-yi][2-xi]
+        current_state = self.neighbours[xi][yi]
         if current_state == 0:
-            self.neighbours[2-yi][2-xi] = 1
+            self.neighbours[xi][yi] = 1
             self.c.itemconfig(self.cSquares[yi][xi], fill='#aaaaaa')
         else:
-            self.neighbours[2-yi][2-xi] = 0
+            self.neighbours[xi][yi] = 0
             self.c.itemconfig(self.cSquares[yi][xi], fill='')
 
     def load_values_from_Rule(self, rule: Rule):
@@ -121,7 +121,7 @@ class RuleModifier:
         self.neighbours = rule.n
         for y in range(3):
             for x in range(3):
-                if rule.n[y][x] == 0:
+                if rule.n[x][y] == 0:
                     self.c.itemconfig(self.cSquares[y][x], fill='')
                 else:
                     self.c.itemconfig(self.cSquares[y][x], fill='#aaaaaa')
@@ -147,10 +147,10 @@ class RuleModifier:
         self.neighbours = json['neighbourhood']
         for y in range(3):
             for x in range(3):
-                if json['neighbourhood'][y][x] == 0:
-                    self.c.itemconfig(self.cSquares[y][x], fill='')
+                if json['neighbourhood'][x][y] == 0:
+                    self.c.itemconfig(self.cSquares[x][y], fill='')
                 else:
-                    self.c.itemconfig(self.cSquares[y][x], fill='#aaaaaa')
+                    self.c.itemconfig(self.cSquares[x][y], fill='#aaaaaa')
         if json['edge'] == 'wrap':
             self.wrapCheckBox.select()
         else:

@@ -1,12 +1,14 @@
 from tkinter import *
 from tkinter import PhotoImage
 from tkinter import messagebox
+from time import sleep
 
 from lib.gridlines import GridLines
 from lib.hexgrid import HexGrid
 from lib.gridGPU import Grid
 from lib.viewfinder import ViewFinder
 from lib.ruleModifier import getNewRule
+from lib.populationGraph import PopulationGraph
 
 class GameWindow:
     def __init__(self, grid: Grid):
@@ -88,6 +90,8 @@ class GameWindow:
         self.clearButton.place(width=40, height=40, x=107, y=self.height-24, anchor='sw')
         self.ruleButton = Button(self.w, border=3, command=self.change_rules, image=self.images['gear'])
         self.ruleButton.place(width=40, height=40, x=147, y=self.height-24, anchor='sw')
+        self.graphButton = Button(self.w, border=3, command=self.populationGraph, image=self.images['gear'])
+        self.graphButton.place(width=40, height=40, x=187, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
         self.zoomOutButton.place(x=self.width-140,y=self.height+4,width=40,height=40,anchor='se')
         self.zoomInButton = Button(self.w, border=5, command=self.zoomIn, image=self.images['zoomIn'])
@@ -201,6 +205,13 @@ class GameWindow:
             self.gridlines = HexGrid(self.c,self.l,self.r,self.t,self.b,self.cellSize)
         else:    
             self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,self.cellSize)
+    
+    # graph button pressed
+    def populationGraph(self):
+        graph = PopulationGraph(self.w, self.grid.population_history)
+        while graph.running:
+            graph.w.update()
+            sleep(0.01)
 
     
     # scroll the screen when arrow keys are pressed
