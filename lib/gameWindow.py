@@ -42,7 +42,8 @@ class GameWindow:
             'zoomIn': PhotoImage(file='images/zoomIn.png'),
             'zoomOut': PhotoImage(file='images/zoomOut.png'),
             'gear': PhotoImage(file='images/gear.png'),
-            'next': PhotoImage(file='images/next.png')
+            'next': PhotoImage(file='images/next.png'),
+            "graph": PhotoImage(file='images/graph.png')
         }
 
 
@@ -90,7 +91,7 @@ class GameWindow:
         self.clearButton.place(width=40, height=40, x=107, y=self.height-24, anchor='sw')
         self.ruleButton = Button(self.w, border=3, command=self.change_rules, image=self.images['gear'])
         self.ruleButton.place(width=40, height=40, x=147, y=self.height-24, anchor='sw')
-        self.graphButton = Button(self.w, border=3, command=self.populationGraph, image=self.images['gear'])
+        self.graphButton = Button(self.w, border=3, command=self.populationGraph, image=self.images['graph'])
         self.graphButton.place(width=40, height=40, x=187, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
         self.zoomOutButton.place(x=self.width-140,y=self.height+4,width=40,height=40,anchor='se')

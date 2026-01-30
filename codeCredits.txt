@@ -11,3 +11,6 @@ this is my own code from a previous project and includes:
 
 https://www.geeksforgeeks.org/python/how-to-embed-matplotlib-charts-in-tkinter-gui/
 - populationGraph.py (basic graph creation)
+
+https://stackoverflow.com/questions/12695678/how-to-modify-the-navigation-toolbar-easily-in-a-matplotlib-figure-window
+- populationGraph.py (custom toolbar class)
