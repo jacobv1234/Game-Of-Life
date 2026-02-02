@@ -11,3 +11,14 @@ class Rule:
         self.hex = hex     # denotes if the grid is hexagonal
     
     # newState function is moved into gridGPU
+
+    # export rule as dictionary
+    def toDict(self):
+        return {
+            "name": "",
+            "born": self.b,
+            "survive": self.s,
+            "neighbourhood": self.n.tolist(),
+            "edge": self.edge,
+            "hexagonal": self.hex
+        }

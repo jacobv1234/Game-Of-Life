@@ -3,7 +3,7 @@ from time import sleep
 from pathlib import Path
 from json import loads
 
-from lib.rule import Rule
+from lib.ruleGPU import Rule
 
 class RuleModifier:
     def __init__(self, master: Tk, rule: Rule):

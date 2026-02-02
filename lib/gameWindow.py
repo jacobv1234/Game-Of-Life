@@ -1,11 +1,16 @@
 from tkinter import *
 from tkinter import PhotoImage
 from tkinter import messagebox
+from tkinter import filedialog
 from time import sleep
+
+import json
+import numpy as np
 
 from lib.gridlines import GridLines
 from lib.hexgrid import HexGrid
 from lib.gridGPU import Grid
+from lib.ruleGPU import Rule
 from lib.viewfinder import ViewFinder
 from lib.ruleModifier import getNewRule
 from lib.populationGraph import PopulationGraph
@@ -43,7 +48,9 @@ class GameWindow:
             'zoomOut': PhotoImage(file='images/zoomOut.png'),
             'gear': PhotoImage(file='images/gear.png'),
             'next': PhotoImage(file='images/next.png'),
-            "graph": PhotoImage(file='images/graph.png')
+            'graph': PhotoImage(file='images/graph.png'),
+            'save': PhotoImage(file='images/save.png'),
+            'open': PhotoImage(file='images/open.png')
         }
 
 
@@ -93,6 +100,10 @@ class GameWindow:
         self.ruleButton.place(width=40, height=40, x=147, y=self.height-24, anchor='sw')
         self.graphButton = Button(self.w, border=3, command=self.populationGraph, image=self.images['graph'])
         self.graphButton.place(width=40, height=40, x=187, y=self.height-24, anchor='sw')
+        self.saveButton = Button(self.w, border=3, command=self.save, image=self.images['save'])
+        self.saveButton.place(width=40, height=40, x=227, y=self.height-24, anchor='sw')
+        self.openButton = Button(self.w, border=3, command=self.open, image=self.images['open'])
+        self.openButton.place(width=40, height=40, x=267, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
         self.zoomOutButton.place(x=self.width-140,y=self.height+4,width=40,height=40,anchor='se')
         self.zoomInButton = Button(self.w, border=5, command=self.zoomIn, image=self.images['zoomIn'])
@@ -100,8 +111,8 @@ class GameWindow:
 
         # generation counter
         self.genCountC = Canvas(self.w, bg='black')
-        self.genCountC.place(x=70,y=self.height+4, width = 230, height=30, anchor='sw')
-        self.genCountC.create_rectangle(0,3,227,30,fill='#f0f0f0', outline='')
+        self.genCountC.place(x=70,y=self.height+4, width = 240, height=30, anchor='sw')
+        self.genCountC.create_rectangle(0,3,237,30,fill='#f0f0f0', outline='')
         self.genText = self.genCountC.create_text(10,10,fill='black', font='Arial 10', text='Generation: 0', anchor='nw')
         self.popText = self.genCountC.create_text(120,10,fill='black', font='Arial 10', text='Population: 0', anchor='nw')
 
@@ -213,6 +224,48 @@ class GameWindow:
         while graph.running:
             graph.w.update()
             sleep(0.01)
+    
+    # save state
+    def save(self):
+        path = filedialog.asksaveasfilename(defaultextension='.json', filetypes=[('JSON','.json')],
+                                            initialdir='./assets/patterns/', initialfile='pattern1.json',
+                                            title='Save Pattern')
+        if path == '':
+            return
+        
+        rule = self.grid.rule.toDict()
+        with open(path, 'w') as f:
+            f.write(json.dumps(rule))
+
+        np.save(path[:-5]+'.npy',self.grid.grid)
+    
+    def open(self):
+        path = filedialog.askopenfilename(defaultextension='.json', filetypes=[('JSON','.json')],
+                                            initialdir='./assets/patterns/',
+                                            title='Load Pattern')
+        if path == '':
+            return
+
+        with open(path, 'r') as f:
+            rule = json.loads(f.read())
+        
+        self.grid.changeRule(
+            Rule(
+                rule['born'],
+                rule['survive'],
+                rule['neighbourhood'],
+                rule['edge'],
+                rule['hexagonal']
+            )
+        )
+
+        self.gridlines.remove()
+        if self.grid.rule.hex == True:
+            self.gridlines = HexGrid(self.c,self.l,self.r,self.t,self.b,self.cellSize)
+        else:    
+            self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,self.cellSize)
+
+        self.grid.grid = np.load(path[:-5]+'.npy')        
 
     
     # scroll the screen when arrow keys are pressed

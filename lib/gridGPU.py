@@ -52,9 +52,6 @@ class Grid:
         self.population_history.append(self.population)
 
     
-
-
-    
     def changeRule(self, rule: Rule):
         self.rule = rule
         
