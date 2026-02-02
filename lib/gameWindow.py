@@ -150,6 +150,7 @@ class GameWindow:
     
     # click to draw
     def toggle_cell(self,event):
+        self.move_cursor(event)
         sx, sy = event.x, event.y
 
         # check mouse is not hovering on a button
@@ -170,6 +171,7 @@ class GameWindow:
     
     # click and drag to draw
     def drag_draw(self,event):
+        self.move_cursor(event)
         sx, sy = event.x, event.y
 
         # check mouse is not hovering on a button
@@ -455,12 +457,27 @@ class GameWindow:
                 yi = int(yo // self.cellSize) % self.grid.gridsize
                 if self.grid.grid[xi][yi] == 1:
                     if self.grid.rule.hex == True and xi%2 == 1:
+                        x1, y1, x2, y2 = x, y-self.cellSize//2, x+self.cellSize, y+self.cellSize-self.cellSize//2 
+                    else:
+                        x1,y1,x2,y2 = x,y, x+self.cellSize, y+self.cellSize
+                    
+                    if self.grid.rule.hex:
+                        h = (x2-x1)/6
+                        yc = (y2+y1)/2
                         self.cells.append(
-                            self.c.create_rectangle(x,y-self.cellSize//2, x+self.cellSize, y+self.cellSize-self.cellSize//2, fill='black')
+                            self.c.create_polygon(
+                                x1+h,y1,
+                                x2-h,y1,
+                                x2+h,yc,
+                                x2-h,y2,
+                                x1+h,y2,
+                                x1-h,yc,
+                                fill='black'
+                            )
                         )
                     else:
                         self.cells.append(
-                            self.c.create_rectangle(x,y, x+self.cellSize, y+self.cellSize, fill='black')
+                            self.c.create_rectangle(x1,y1,x2,y2, fill='black')
                         )
         # layering
         self.c.tag_raise(self.scLimitBox)
