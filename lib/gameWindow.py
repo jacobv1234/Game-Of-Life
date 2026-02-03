@@ -75,7 +75,7 @@ class GameWindow:
         self.cells = []
 
         # mouse cursor tracking
-        self.cursor = self.c.create_rectangle(0,0,self.cellSize,self.cellSize, fill='', outline="#0000bd")
+        self.cursor = self.c.create_rectangle(0,0,self.cellSize,self.cellSize, fill='', outline="red",width=3)
         self.curx = 0
         self.cury = 0
 
@@ -144,7 +144,21 @@ class GameWindow:
             self.curx = (x // self.cellSize) * self.cellSize
             self.cury = (y // self.cellSize) * self.cellSize
         # move cursor
-        self.c.coords(self.cursor, self.curx, self.cury, self.curx+self.cellSize, self.cury+self.cellSize)
+        if self.grid.rule.hex:
+            h = self.cellSize/6
+            x1,y1 = self.curx,self.cury
+            x2,y2 = self.curx+self.cellSize, self.cury+self.cellSize
+            yc = (y1+y2)/2
+            self.c.coords(self.cursor,
+                          x1+h,y1,
+                          x2-h,y1,
+                          x2+h,yc,
+                          x2-h,y2,
+                          x1+h,y2,
+                          x1-h,yc
+            )
+        else:
+            self.c.coords(self.cursor, self.curx, self.cury, self.curx+self.cellSize, self.cury+self.cellSize)
         self.mouseOnButton = False
 
     
@@ -206,6 +220,28 @@ class GameWindow:
             self.playButton.config(image = self.images['play'])
         return clear
     
+    def redrawGridAndCursor(self):
+        self.gridlines.remove()
+        self.c.delete(self.cursor)
+        if self.grid.rule.hex == True:
+            self.gridlines = HexGrid(self.c,self.l,self.r,self.t,self.b,self.cellSize)
+            h = self.cellSize/6
+            x1,y1 = 0,0
+            x2,y2 = self.cellSize, self.cellSize
+            yc = (y1+y2)/2
+            self.cursor = self.c.create_polygon(
+                x1+h,y1,
+                x2-h,y1,
+                x2+h,yc,
+                x2-h,y2,
+                x1+h,y2,
+                x1-h,yc,
+                fill='',outline="red",width=3
+            )
+        else:    
+            self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,self.cellSize)
+            self.cursor = self.c.create_rectangle(0,0,self.cellSize,self.cellSize, fill='', outline="red", width=3)
+    
     # rule modification button pressed
     def change_rules(self):
         screen_cleared = self.clear_screen()
@@ -214,11 +250,7 @@ class GameWindow:
         self.update()
         rule = getNewRule(self.w, self.grid.rule)
         self.grid.changeRule(rule) #type:ignore
-        self.gridlines.remove()
-        if self.grid.rule.hex == True:
-            self.gridlines = HexGrid(self.c,self.l,self.r,self.t,self.b,self.cellSize)
-        else:    
-            self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,self.cellSize)
+        self.redrawGridAndCursor()
     
     # graph button pressed
     def populationGraph(self):
@@ -261,11 +293,7 @@ class GameWindow:
             )
         )
 
-        self.gridlines.remove()
-        if self.grid.rule.hex == True:
-            self.gridlines = HexGrid(self.c,self.l,self.r,self.t,self.b,self.cellSize)
-        else:    
-            self.gridlines = GridLines(self.c,self.l,self.r,self.t,self.b,self.cellSize)
+        self.redrawGridAndCursor()
 
         self.grid.grid = np.load(path[:-5]+'.npy')        
 
