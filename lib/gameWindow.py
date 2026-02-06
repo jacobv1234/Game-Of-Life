@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import PhotoImage
 from tkinter import messagebox
 from tkinter import filedialog
-from time import sleep, perf_counter
+from time import sleep
 
 import json
 import numpy as np
@@ -115,14 +115,6 @@ class GameWindow:
         self.genCountC.create_rectangle(0,3,237,30,fill='#f0f0f0', outline='')
         self.genText = self.genCountC.create_text(10,10,fill='black', font='Arial 10', text='Generation: 0', anchor='nw')
         self.popText = self.genCountC.create_text(120,10,fill='black', font='Arial 10', text='Population: 0', anchor='nw')
-
-        # performance
-        self.perfC = Canvas(self.w, bg='white')
-        self.perfC.place(x=self.width, y=0, width=200, height=75, anchor='ne')
-        self.popProcTimeText = self.perfC.create_text(10,25, fill='black', font='Arial 10', text='GenTime: 0', anchor='w')
-        self.FPSText = self.perfC.create_text(10, 50, fill='black', font='Arial 10', text='FPS: 0', anchor = 'w')
-        self.startTime = 0
-        self.endTime = 1/30
 
     # move highlighted square
     def move_cursor(self, event: Event):
@@ -464,10 +456,6 @@ class GameWindow:
 
     
     def update(self):
-        self.endTime = perf_counter()
-        fps = 1/(self.endTime - self.startTime)
-        self.startTime = perf_counter()
-
         # remove non-static features from last frame (cells)
         for cell in self.cells:
             self.c.delete(cell)
@@ -475,9 +463,6 @@ class GameWindow:
         # update generation counter
         self.genCountC.itemconfig(self.genText, text=f'Generation: {self.grid.gens}')
         self.genCountC.itemconfig(self.popText, text=f'Population: {self.grid.population}')
-
-        self.perfC.itemconfig(self.popProcTimeText, text=f'GenTime: {self.grid.processingTime}')
-        self.perfC.itemconfig(self.FPSText, text=f'FPS: {fps}')
 
         # draw cells
         # only in visible range

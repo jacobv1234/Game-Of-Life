@@ -3,7 +3,6 @@ import numpy as np
 import numba as nb
 import numba.cuda as cuda
 
-from lib.ruleGPU import Rule
 
 # Rule cant be passed in directly
 # edge should be translated to int(rule.edge=='wrap') as cuda.jit functions don't like strings
@@ -40,30 +39,9 @@ def nextGPU(state: np.ndarray, b: np.ndarray, s: np.ndarray, n: np.ndarray, edge
         for i in range(len(b)):
             if b[i] == count:
                 newState[y,x] = 1
-                return
-        newState[y,x] = 0
+                break
     else:
         for i in range(len(s)):
             if s[i] == count:
                 newState[y,x] = 1
-                return
-        newState[y,x] = 0
-
-class GPUInterFace:
-    def __init__(self, gridsize:int):
-        self.newState = cuda.device_array(shape=(gridsize, gridsize))
-        self.stateOnGPU = cuda.device_array(shape=(gridsize, gridsize))
-        self.gridsize = gridsize
-
-    def nextState(self, currentState: np.ndarray, rule: Rule):
-        blocks = (self.gridsize,self.gridsize)
-        threads = 1
-        self.stateOnGPU.copy_to_device(currentState)
-        nextGPU[blocks,threads](self.stateOnGPU,   # type: ignore
-                                np.asarray(rule.b),
-                                np.asarray(rule.s),
-                                np.asarray(rule.n),
-                                int(rule.edge=='wrap'),
-                                self.gridsize, self.newState)
-
-        self.newState.copy_to_host(currentState)
+                break
