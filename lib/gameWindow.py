@@ -3,6 +3,7 @@ from tkinter import PhotoImage
 from tkinter import messagebox
 from tkinter import filedialog
 from time import sleep
+from random import randint
 
 import json
 import numpy as np
@@ -14,6 +15,7 @@ from lib.ruleGPU import Rule
 from lib.viewfinder import ViewFinder
 from lib.ruleModifier import getNewRule
 from lib.populationGraph import PopulationGraph
+from lib.soupGen import getSoupParams
 
 class GameWindow:
     def __init__(self, grid: Grid):
@@ -104,6 +106,8 @@ class GameWindow:
         self.saveButton.place(width=40, height=40, x=227, y=self.height-24, anchor='sw')
         self.openButton = Button(self.w, border=3, command=self.open, image=self.images['open'])
         self.openButton.place(width=40, height=40, x=267, y=self.height-24, anchor='sw')
+        self.soupButton = Button(self.w, border=3, command=self.makeSoup, image=self.images['open'])
+        self.soupButton.place(width=40, height=40, x=307, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
         self.zoomOutButton.place(x=self.width-140,y=self.height+4,width=40,height=40,anchor='se')
         self.zoomInButton = Button(self.w, border=5, command=self.zoomIn, image=self.images['zoomIn'])
@@ -259,6 +263,44 @@ class GameWindow:
             graph.w.update()
             sleep(0.01)
     
+    def makeSoup(self):
+        screen_cleared = self.clear_screen()
+        if screen_cleared == False:
+            return
+        shape,radius,density = getSoupParams(self.w) # type:ignore
+        if shape == 'cancel':
+            return
+        try:
+            radius = int(radius)
+            assert radius > 0
+            assert radius < self.grid.gridsize // 2
+        except:
+            messagebox.showwarning('Warning',f'Radius must be an integer between 1 and {self.grid.gridsize//2 - 1} (inclusive)')
+            return
+        try:
+            density = float(density)
+            assert density >= 0
+            assert density <= 1
+        except:
+            messagebox.showwarning('Warning','Density must be a decimal between 0 and 1 (inclusive)')
+            return
+        
+        offset = self.grid.gridsize // 2
+        for y in range(-offset,offset,1):
+            for x in range(-offset,offset,1):
+                if randint(0,99) >= density * 100:
+                    continue
+                if shape == 'Circle':
+                    if (x**2+y**2) <= radius**2:
+                        self.grid.set(x+offset,y+offset,1)
+                if shape == 'Square':
+                    if abs(x)<=radius and abs(y)<=radius:
+                        self.grid.set(x+offset,y+offset,1)
+                if shape == 'Hexagon':
+                    if abs(x)<=radius and abs(y)<=radius and y>=x-radius and y<=x+radius:
+                        self.grid.set(x+offset,y+offset,1)
+
+
     # save state
     def save(self):
         path = filedialog.asksaveasfilename(defaultextension='.json', filetypes=[('JSON','.json')],
