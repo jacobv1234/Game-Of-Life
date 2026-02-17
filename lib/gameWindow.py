@@ -52,7 +52,8 @@ class GameWindow:
             'next': PhotoImage(file='images/next.png'),
             'graph': PhotoImage(file='images/graph.png'),
             'save': PhotoImage(file='images/save.png'),
-            'open': PhotoImage(file='images/open.png')
+            'open': PhotoImage(file='images/open.png'),
+            'shuffle': PhotoImage(file='images/shuffle.png')
         }
 
 
@@ -106,7 +107,7 @@ class GameWindow:
         self.saveButton.place(width=40, height=40, x=227, y=self.height-24, anchor='sw')
         self.openButton = Button(self.w, border=3, command=self.open, image=self.images['open'])
         self.openButton.place(width=40, height=40, x=267, y=self.height-24, anchor='sw')
-        self.soupButton = Button(self.w, border=3, command=self.makeSoup, image=self.images['open'])
+        self.soupButton = Button(self.w, border=3, command=self.makeSoup, image=self.images['shuffle'])
         self.soupButton.place(width=40, height=40, x=307, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
         self.zoomOutButton.place(x=self.width-140,y=self.height+4,width=40,height=40,anchor='se')
@@ -115,10 +116,10 @@ class GameWindow:
 
         # generation counter
         self.genCountC = Canvas(self.w, bg='black')
-        self.genCountC.place(x=70,y=self.height+4, width = 240, height=30, anchor='sw')
-        self.genCountC.create_rectangle(0,3,237,30,fill='#f0f0f0', outline='')
+        self.genCountC.place(x=70,y=self.height+4, width = 280, height=30, anchor='sw')
+        self.genCountC.create_rectangle(0,3,277,30,fill='#f0f0f0', outline='')
         self.genText = self.genCountC.create_text(10,10,fill='black', font='Arial 10', text='Generation: 0', anchor='nw')
-        self.popText = self.genCountC.create_text(120,10,fill='black', font='Arial 10', text='Population: 0', anchor='nw')
+        self.popText = self.genCountC.create_text(140,10,fill='black', font='Arial 10', text='Population: 0', anchor='nw')
 
     # move highlighted square
     def move_cursor(self, event: Event):
