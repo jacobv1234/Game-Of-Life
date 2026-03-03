@@ -2,6 +2,8 @@ import numpy as np
 import numba as nb
 import numba.cuda as cuda
 
+from math import floor
+
 from lib.ruleGPU import Rule
 from lib.nextState import nextGPU
 
@@ -14,23 +16,27 @@ class Grid:
         self.gens = 0
         self.population = 0
         self.population_history = [0]
+        self.stable = -1
     
     def toggle(self, x: int, y: int):
         self.grid[x][y] = 1 - self.grid[x][y]
         self.gens = 0
         self.population = int(np.sum(self.grid))
         self.population_history = [self.population]
+        self.stable = -1
         return self.grid[x][y]
 
     def set(self,x:int,y:int,s:int):
         self.gens = 0
         self.grid[x][y] = s
+        self.stable = -1
         self.population = int(np.sum(self.grid))
         self.population_history = [self.population]
     
     def reset(self):
         self.grid = np.zeros(self.gridsize**2, dtype='byte')
         self.grid = self.grid.reshape((self.gridsize,self.gridsize))
+        self.stable = -1
         self.gens = 0
         self.population = 0
         self.population_history = [0]
@@ -51,7 +57,32 @@ class Grid:
         self.population = int(np.sum(self.grid))
         self.population_history.append(self.population)
 
+        if self.gens % 50 == 0 and self.stable == -1:
+            self.stable = self.isStabilised()
+
     
     def changeRule(self, rule: Rule):
         self.rule = rule
+    
+    def isStabilised(self):
+        if self.gens < 200:
+            maskSize = floor(self.gens/2)
+        else:
+            maskSize = 100
+        mask = self.population_history[-2*maskSize:-maskSize]
+        
+        # 2 values: first, last
+        # first is the index of the first value of the first comparison
+        # last is the index of the last value of the first comparison = first value of last comparison
+        first = (maskSize * -2) +1
+        last = -maskSize
+        comparisons = [self.population_history[i:i+maskSize] for i in range(first, last)]
+        comparisons.append(self.population_history[last:])
+
+        for i in range(len(comparisons)):
+            if all([mask[j]==comparisons[i][j] for j in range(len(mask))]):
+                return first + i + self.gens
+        return -1
+
+
         

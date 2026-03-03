@@ -116,10 +116,11 @@ class GameWindow:
 
         # generation counter
         self.genCountC = Canvas(self.w, bg='black')
-        self.genCountC.place(x=70,y=self.height+4, width = 280, height=30, anchor='sw')
-        self.genCountC.create_rectangle(0,3,277,30,fill='#f0f0f0', outline='')
+        self.genCountC.place(x=70,y=self.height+4, width = 420, height=30, anchor='sw')
+        self.genCountC.create_rectangle(0,3,417,30,fill='#f0f0f0', outline='')
         self.genText = self.genCountC.create_text(10,10,fill='black', font='Arial 10', text='Generation: 0', anchor='nw')
         self.popText = self.genCountC.create_text(140,10,fill='black', font='Arial 10', text='Population: 0', anchor='nw')
+        self.stblText= self.genCountC.create_text(270,10,fill='black', font='Arial 10', text='Stabilised: -1', anchor='nw')
 
     # move highlighted square
     def move_cursor(self, event: Event):
@@ -506,6 +507,7 @@ class GameWindow:
         # update generation counter
         self.genCountC.itemconfig(self.genText, text=f'Generation: {self.grid.gens}')
         self.genCountC.itemconfig(self.popText, text=f'Population: {self.grid.population}')
+        self.genCountC.itemconfig(self.stblText,text=f'Stabilised: {self.grid.stable}')
 
         # draw cells
         # only in visible range
