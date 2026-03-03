@@ -260,7 +260,7 @@ class GameWindow:
     
     # graph button pressed
     def populationGraph(self):
-        graph = PopulationGraph(self.w, self.grid.population_history)
+        graph = PopulationGraph(self.w, self.grid.population_history, self.grid.stable)
         while graph.running:
             graph.w.update()
             sleep(0.01)

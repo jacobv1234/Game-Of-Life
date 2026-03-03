@@ -10,7 +10,7 @@ class NoConfigToolbar(NavigationToolbar2Tk):
                        ['Home', 'Pan', 'Zoom', None, 'Save']])
 
 class PopulationGraph:
-    def __init__(self, master: Tk, history: list[int]):
+    def __init__(self, master: Tk, history: list[int], stable: int = -1):
         self.running = True
 
         self.w = Toplevel(master)
@@ -23,6 +23,8 @@ class PopulationGraph:
 
         # add history to graph
         self.plot.plot(history)
+        if stable != -1:
+            self.plot.axvline(stable, color='red', linestyle = 'dashed')
 
         # tkinter graph canvas object
         self.c = FigureCanvasTkAgg(self.fig, self.w)
