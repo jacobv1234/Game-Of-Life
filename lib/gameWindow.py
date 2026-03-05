@@ -53,7 +53,8 @@ class GameWindow:
             'graph': PhotoImage(file='images/graph.png'),
             'save': PhotoImage(file='images/save.png'),
             'open': PhotoImage(file='images/open.png'),
-            'shuffle': PhotoImage(file='images/shuffle.png')
+            'shuffle': PhotoImage(file='images/shuffle.png'),
+            'qSim': PhotoImage(file='images/qSim.png')
         }
 
 
@@ -109,6 +110,8 @@ class GameWindow:
         self.openButton.place(width=40, height=40, x=267, y=self.height-24, anchor='sw')
         self.soupButton = Button(self.w, border=3, command=self.makeSoup, image=self.images['shuffle'])
         self.soupButton.place(width=40, height=40, x=307, y=self.height-24, anchor='sw')
+        self.qSimButton = Button(self.w, border=3, command=self.quickSim, image=self.images['qSim'])
+        self.qSimButton.place(width=40, height=40, x=347, y=self.height-24, anchor='sw')
         self.zoomOutButton = Button(self.w, border=5, command=self.zoomOut, image=self.images['zoomOut'])
         self.zoomOutButton.place(x=self.width-140,y=self.height+4,width=40,height=40,anchor='se')
         self.zoomInButton = Button(self.w, border=5, command=self.zoomIn, image=self.images['zoomIn'])
@@ -301,6 +304,16 @@ class GameWindow:
                 if shape == 'Hexagon':
                     if abs(x)<=radius and abs(y)<=radius and y>=x-radius and y<=x+radius:
                         self.grid.set(x+offset,y+offset,1)
+    
+    def quickSim(self):
+        if self.simulationOn:
+            return
+        cutoff = 2000
+        while self.grid.gens < cutoff:
+            self.grid.next()
+            if self.grid.stable != -1:
+                break
+        self.populationGraph()
 
 
     # save state
