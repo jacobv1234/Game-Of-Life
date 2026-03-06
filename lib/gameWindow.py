@@ -16,6 +16,7 @@ from lib.viewfinder import ViewFinder
 from lib.ruleModifier import getNewRule
 from lib.populationGraph import PopulationGraph
 from lib.soupGen import getSoupParams
+from lib.QSimWindow import getQSimCutoff
 
 class GameWindow:
     def __init__(self, grid: Grid):
@@ -308,12 +309,21 @@ class GameWindow:
     def quickSim(self):
         if self.simulationOn:
             return
-        cutoff = 2000
-        while self.grid.gens < cutoff:
-            self.grid.next()
-            if self.grid.stable != -1:
-                break
-        self.populationGraph()
+        cutoff = getQSimCutoff(self.w)
+        if cutoff == 'cancel':
+            return
+        try:
+            cutoff = int(cutoff)
+            assert cutoff > 0
+            while self.grid.gens < cutoff:
+                self.grid.next()
+                if self.grid.stable != -1:
+                    break
+            self.populationGraph()
+            
+        except Exception as e:
+            messagebox.showwarning('Warning','Cutoff must be a positive integer.')
+        
 
 
     # save state
