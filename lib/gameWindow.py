@@ -17,6 +17,7 @@ from lib.ruleModifier import getNewRule
 from lib.populationGraph import PopulationGraph
 from lib.soupGen import getSoupParams
 from lib.QSimWindow import getQSimCutoff
+from lib.MSimWindow import getMSimSettings
 
 class GameWindow:
     def __init__(self, grid: Grid):
@@ -312,6 +313,9 @@ class GameWindow:
         cutoff = getQSimCutoff(self.w)
         if cutoff == 'cancel':
             return
+        if cutoff == 'multiple':
+            self.multipleSim()
+            return
         try:
             cutoff = int(cutoff)
             assert cutoff > 0
@@ -324,7 +328,12 @@ class GameWindow:
         except Exception as e:
             messagebox.showwarning('Warning','Cutoff must be a positive integer.')
         
-
+    def multipleSim(self):
+        screen_cleared = self.clear_screen()
+        if screen_cleared == False:
+            return
+        
+        settings = getMSimSettings(self.w)
 
     # save state
     def save(self):
