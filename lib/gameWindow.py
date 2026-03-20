@@ -7,6 +7,7 @@ from random import randint
 
 import json
 import numpy as np
+import matplotlib.pyplot as plt
 
 from lib.gridlines import GridLines
 from lib.hexgrid import HexGrid
@@ -15,6 +16,7 @@ from lib.ruleGPU import Rule
 from lib.viewfinder import ViewFinder
 from lib.ruleModifier import getNewRule
 from lib.populationGraph import PopulationGraph
+from lib.multigameGraph import MultiGameGraph
 from lib.soupGen import getSoupParams
 from lib.QSimWindow import getQSimCutoff
 from lib.MSimWindow import getMSimSettings
@@ -292,6 +294,9 @@ class GameWindow:
             messagebox.showwarning('Warning','Density must be a decimal between 0 and 1 (inclusive)')
             return
         
+        self.genSoup(shape,radius,density)
+
+    def genSoup(self, shape, radius, density):
         offset = self.grid.gridsize // 2
         for y in range(-offset,offset,1):
             for x in range(-offset,offset,1):
@@ -334,6 +339,77 @@ class GameWindow:
             return
         
         settings = getMSimSettings(self.w)
+        if settings == 'cancel':
+            return
+        
+        # validity checks
+        shape = settings['shape']
+        radius = settings['radius']
+        try:
+            radius = int(radius)
+            assert radius > 0
+        except Exception:
+            messagebox.showwarning('Warning','Radius must be a positive integer.')
+            return
+        
+        density = settings['density']
+        try:
+            density = float(density)
+            assert density >= 0 and density <= 1
+        except Exception:
+            messagebox.showwarning('Warning','Density must be a positive number between 0 and 1.')
+            return
+        
+        games = settings['games']
+        try:
+            games = int(games)
+            assert games > 0
+        except Exception:
+            messagebox.showwarning('Warning','Games must be a positive integer.')
+            return
+        
+        cutoff = settings['cutoff']
+        try:
+            cutoff = int(cutoff)
+            assert cutoff > 0
+        except Exception:
+            messagebox.showwarning('Warning','Cutoff must be a positive integer.')
+            return
+
+        # begin simulations
+        print('Starting simulations...')
+        stableAt = []
+        finalPop = []
+        for i in range(games):
+            # generate seed
+            self.grid.reset()
+            self.genSoup(shape, radius, density)
+
+            # simulate
+            while self.grid.gens < cutoff:
+                    self.grid.next()
+                    if self.grid.stable != -1:
+                        break
+            
+            # get statistics
+            stableGen = self.grid.stable
+            if stableGen == -1:
+                stableGen = cutoff
+            
+            stablePop = self.grid.population_history[stableGen]
+
+            stableAt.append(stableGen)
+            finalPop.append(stablePop)
+            print(f'Completed game {i+1} of {games}.')
+        
+        print('Finished.')
+        np.save('SimulationResult.npy', np.asarray([stableAt,finalPop]))
+        
+        graph = MultiGameGraph(self.w, stableAt, finalPop)
+        while graph.running:
+            graph.w.update()
+            sleep(0.01)
+
 
     # save state
     def save(self):
