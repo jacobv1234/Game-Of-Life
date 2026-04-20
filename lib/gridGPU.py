@@ -57,7 +57,10 @@ class Grid:
         self.population = int(np.sum(self.grid))
         self.population_history.append(self.population)
 
-        if self.stable == -1:
+        if self.population == 0 and self.stable == -1:
+            self.stable = self.gens
+        
+        if self.stable == -1 and self.gens >= 10:
             self.stable = self.isStabilised()
 
     
@@ -69,19 +72,22 @@ class Grid:
             maskSize = floor(self.gens/2)
         else:
             maskSize = 100
-        mask = self.population_history[-2*maskSize:-maskSize]
+        mask = self.population_history[-maskSize:]
+
+        if all([val == mask[0] for val in mask]):
+            return self.gens - maskSize + 1
         
         # 2 values: first, last
         # first is the index of the first value of the first comparison
         # last is the index of the last value of the first comparison = first value of last comparison
-        first = (maskSize * -2) +1
-        last = -maskSize
-        comparisons = [self.population_history[i:i+maskSize] for i in range(first, last)]
-        comparisons.append(self.population_history[last:])
+        first = (maskSize * -2)
+        last = -maskSize - 1
+        comparisons = [self.population_history[i:i+maskSize] for i in range(first, last+1)]
+        #comparisons.append(self.population_history[last:])
 
         for i in range(len(comparisons)):
             if all([mask[j]==comparisons[i][j] for j in range(len(mask))]):
-                return first + i + self.gens
+                return first + i + self.gens + 1
         return -1
 
 
