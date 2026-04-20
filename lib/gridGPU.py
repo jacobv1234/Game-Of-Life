@@ -57,7 +57,7 @@ class Grid:
         self.population = int(np.sum(self.grid))
         self.population_history.append(self.population)
 
-        if self.gens % 50 == 0 and self.stable == -1:
+        if self.stable == -1:
             self.stable = self.isStabilised()
 
     
